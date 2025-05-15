@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Catch the MUT8 Virus</title>
 <style>
   body {
@@ -79,15 +79,27 @@
     margin-top: 0;
   }
 
-  /* Responsive */
+  /* Updated Responsive Styles for Mobile (incl Safari) */
   @media (max-width: 768px) {
     #startButton {
-      font-size: 2.4em !important;
-      padding: 20px 0 !important;
+      font-size: 2.8em !important;
+      padding: 24px 0 !important;
       max-width: 100% !important;
       width: 90vw !important;
       border-radius: 12px !important;
-      margin: 15px auto !important;
+      margin: 20px auto !important;
+      display: block !important;
+      -webkit-appearance: none !important;
+      -webkit-touch-callout: none !important;
+      -webkit-user-select: none !important;
+      user-select: none !important;
+    }
+    #usernameInput {
+      font-size: 1.8em !important;
+      max-width: 90vw !important;
+      width: 90vw !important;
+      padding: 12px !important;
+      margin: 10px auto !important;
       display: block !important;
     }
   }
@@ -136,7 +148,6 @@
     virus.style.bottom = '-90px';
     gameContainer.appendChild(virus);
 
-    // Speed up virus based on score (minimum 800ms duration)
     const speed = Math.max(3000 - score * 20, 800);
 
     virus.animate(
@@ -253,7 +264,6 @@
     spawnViruses();
   });
 
-  // Show start screen initially
   showStartScreen();
   renderLeaderboard();
 </script>
