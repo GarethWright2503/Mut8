@@ -44,10 +44,10 @@
 
   .virus {
     position: absolute;
-    width: 30vw;
-    height: 30vw;
-    max-width: 175px;
-    max-height: 175px;
+    width: 28vw;
+    height: 28vw;
+    max-width: 180px;
+    max-height: 1800px;
     background-image: url('Images/Zombie.png');
     background-size: contain;
     background-repeat: no-repeat;
@@ -59,11 +59,12 @@
   }
 
   #scoreboard {
-    font-size: 1.5em;
+    font-size: 2.4em;
     margin: 10px 0 20px 0;
     display: none; /* hidden initially */
   }
 
+  /* Add explicit button styles for consistent color */
   #usernameInput, #startButton, #playAgainButton {
     font-size: 1.3em;
     padding: 10px 15px;
@@ -73,6 +74,20 @@
     max-width: 320px;
     width: 320px;
     box-sizing: border-box;
+    background-color: #28a745;  /* Green background */
+    color: white;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  #usernameInput {
+    background-color: #222;
+    color: #eee;
+    font-weight: normal;
+  }
+
+  #startButton:hover, #playAgainButton:hover {
+    background-color: #218838;  /* Darker green on hover */
   }
 
   #leaderboard {
@@ -94,12 +109,12 @@
   /* Responsive for mobile */
   @media (max-width: 480px) {
     h1 {
-      font-size: 3em;
+      font-size: 4.8em;
       margin-top: 30px;
     }
 
     #subtitle {
-      font-size: 1.5em;
+      font-size: 3.2em;
       margin-bottom: 25px;
     }
 
@@ -134,7 +149,7 @@
 <body>
 
 <h1>Catch the MUT8 Virus</h1>
-<div id="subtitle">Play to receive free airdrop of up to 100 tokens. There is no cure.</div>
+<div id="subtitle">Play to receive free airdrop of 100 tokens. There is no cure.</div>
 
 <div id="startScreen">
   <input type="text" id="usernameInput" placeholder="Enter your Solana wallet address" maxlength="44" />
@@ -181,12 +196,15 @@
     virus.style.bottom = '-90px';
     gameContainer.appendChild(virus);
 
-    const speed = Math.max(3000 - score * 20, 800);
+    // Calculate speed dynamically based on score, minimum 800ms duration
+    const speed = Math.max(3000 - score * 40, 800);
 
-    virus.animate(
+    const animation = virus.animate(
       [{ transform: 'translateY(0)' }, { transform: `translateY(-${gameContainer.clientHeight + 100}px)` }],
       { duration: speed, easing: 'linear' }
-    ).onfinish = () => {
+    );
+
+    animation.onfinish = () => {
       if (virus.parentElement) {
         endGame();
       }
@@ -196,6 +214,7 @@
       if (!gameActive) return;
       score++;
       scoreboard.textContent = `Score: ${score}`;
+      animation.cancel();
       virus.remove();
       viruses = viruses.filter(v => v !== virus);
     }
@@ -210,10 +229,11 @@
   }
 
   function spawnViruses() {
+    clearInterval(spawnInterval);
     spawnInterval = setInterval(() => {
       if (!gameActive) return;
       createVirus();
-    }, Math.max(1500 - score * 10, 400));
+    }, Math.max(1500 - score * 15, 400));
   }
 
   function endGame() {
@@ -269,6 +289,10 @@
     scoreboard.style.display = 'none';
     leaderboard.style.display = 'none';
     scoreboard.textContent = 'Score: 0';
+
+    // Remove play again button if exists
+    const playAgainBtn = document.getElementById('playAgainButton');
+    if(playAgainBtn) playAgainBtn.remove();
   }
 
   function showGame() {
@@ -292,6 +316,16 @@
       btn.textContent = 'Play Again';
       btn.style.display = 'inline-block';
       btn.style.marginTop = '15px';
+      btn.style.backgroundColor = '#007bff';
+      btn.style.color = '#fff';
+      btn.style.border = 'none';
+      btn.style.padding = '10px 20px';
+      btn.style.borderRadius = '5px';
+      btn.style.fontSize = '1.3em';
+      btn.style.cursor = 'pointer';
+      btn.onmouseenter = () => btn.style.backgroundColor = '#0056b3';
+      btn.onmouseleave = () => btn.style.backgroundColor = '#007bff';
+
       btn.onclick = () => {
         score = 0;
         scoreboard.textContent = `Score: ${score}`;
