@@ -201,8 +201,7 @@
   .then(() => console.log("Score saved"))
   .catch(err => console.error("Error saving score:", err));
     }
-  }
-
+  
   function renderLeaderboard() {
   fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc?sort_by=score&sort_order=desc&limit=10")
     .then(res => res.json())
