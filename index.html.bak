@@ -28,7 +28,7 @@
     overflow: hidden;
     margin: 0 auto;
     touch-action: manipulation;
-    display: none;
+    display: none; /* hidden initially */
   }
 
   .virus {
@@ -50,7 +50,7 @@
   #scoreboard {
     font-size: 1.5em;
     margin: 10px 0 20px 0;
-    display: none;
+    display: none; /* hidden initially */
   }
 
   #usernameInput, #startButton {
@@ -63,7 +63,7 @@
     width: 300px;
   }
 
-  #leaderboard-container {
+  #leaderboard {
     max-width: 400px;
     margin: 20px auto;
     background: rgba(0,0,0,0.6);
@@ -71,18 +71,36 @@
     border-radius: 8px;
     font-size: 1em;
     overflow-y: auto;
-    max-height: 300px;
-    display: none;
+    max-height: 220px;
+    display: none; /* hidden initially */
   }
 
-  #leaderboard-container h2 {
+  #leaderboard h2 {
     margin-top: 0;
   }
 
-  #leaderboard-list {
-    list-style-type: decimal;
-    padding-left: 20px;
-    text-align: left;
+  /* Game Over Screen style */
+  #gameOverScreen {
+    display: none;
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 350px;
+    text-align: center;
+    z-index: 9999;
+  }
+
+  #gameOverScreen button {
+    font-size: 1.2em;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
   }
 
   /* Responsive */
@@ -92,10 +110,10 @@
       font-size: 1.4em;
     }
 
-    #leaderboard-container {
+    #leaderboard {
       width: 90%;
       font-size: 0.9em;
-      max-height: 220px;
+      max-height: 180px;
     }
 
     #scoreboard {
@@ -116,9 +134,15 @@
 <div id="scoreboard">Score: 0</div>
 <div id="gameContainer"></div>
 
-<div id="leaderboard-container">
-  <h2>Top 20 Players</h2>
-  <ul id="leaderboard-list"></ul>
+<div id="leaderboard">
+  <h2>Leaderboard</h2>
+  <ol id="leaderboardList"></ol>
+</div>
+
+<div id="gameOverScreen">
+  <h2>Game Over!</h2>
+  <p id="finalScore">Your score: 0</p>
+  <button id="playAgainButton">Play Again</button>
 </div>
 
 <script>
@@ -126,9 +150,12 @@
   const scoreboard = document.getElementById('scoreboard');
   const startButton = document.getElementById('startButton');
   const usernameInput = document.getElementById('usernameInput');
-  const leaderboardContainer = document.getElementById('leaderboard-container');
-  const leaderboardList = document.getElementById('leaderboard-list');
+  const leaderboardList = document.getElementById('leaderboardList');
   const startScreen = document.getElementById('startScreen');
+  const leaderboard = document.getElementById('leaderboard');
+  const gameOverScreen = document.getElementById('gameOverScreen');
+  const finalScore = document.getElementById('finalScore');
+  const playAgainButton = document.getElementById('playAgainButton');
 
   let score = 0;
   let viruses = [];
@@ -147,7 +174,7 @@
     virus.style.bottom = '-90px';
     gameContainer.appendChild(virus);
 
-    // Speed increases as score increases (minimum duration 800ms)
+    // Speed increases as score grows
     const speed = Math.max(3000 - score * 20, 800);
 
     virus.animate(
@@ -188,8 +215,12 @@
     clearInterval(spawnInterval);
     viruses.forEach(v => v.remove());
     viruses = [];
-    alert(`Game Over! Your score: ${score}`);
+
+    finalScore.textContent = `Your score: ${score}`;
+    gameOverScreen.style.display = 'block';
+
     saveScore();
+    renderLeaderboard();
     showLeaderboard();
   }
 
@@ -197,50 +228,31 @@
     const username = usernameInput.value.trim() || 'Anonymous';
     const timestamp = new Date().toISOString();
 
-    const scoreData = {
-      data: [{
-        username,
-        score,
-        timestamp
-      }]
-    };
-
     fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(scoreData)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: [{ username, score, timestamp }]
+      })
     })
     .then(res => res.json())
-    .then(response => {
-      console.log("Score saved:", response);
-      renderLeaderboard();  // Refresh leaderboard after save
-    })
-    .catch(err => {
-      console.error("Error saving score:", err);
-    });
+    .then(() => console.log("Score saved"))
+    .catch(err => console.error("Error saving score:", err));
   }
-
+  
   function renderLeaderboard() {
-    leaderboardList.innerHTML = "<li>Loading leaderboard...</li>";
     fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc?sort_by=score&sort_order=desc&limit=20")
       .then(res => res.json())
       .then(data => {
-        leaderboardList.innerHTML = "";
-        if (!data || data.length === 0) {
-          leaderboardList.innerHTML = "<li>No scores yet.</li>";
-          return;
-        }
+        leaderboardList.innerHTML = '';
         data.forEach(entry => {
-          const li = document.createElement("li");
+          const li = document.createElement('li');
           li.textContent = `${entry.username}: ${entry.score}`;
           leaderboardList.appendChild(li);
         });
       })
       .catch(err => {
-        console.error("Error fetching leaderboard:", err);
-        leaderboardList.innerHTML = "<li>Error loading leaderboard.</li>";
+        console.error("Error loading leaderboard:", err);
       });
   }
 
@@ -248,21 +260,23 @@
     startScreen.style.display = 'block';
     gameContainer.style.display = 'none';
     scoreboard.style.display = 'none';
-    leaderboardContainer.style.display = 'none';
+    leaderboard.style.display = 'none';
+    gameOverScreen.style.display = 'none';
   }
 
   function showGame() {
     startScreen.style.display = 'none';
     gameContainer.style.display = 'block';
     scoreboard.style.display = 'block';
-    leaderboardContainer.style.display = 'none';
+    leaderboard.style.display = 'none';
+    gameOverScreen.style.display = 'none';
   }
 
   function showLeaderboard() {
     startScreen.style.display = 'none';
     gameContainer.style.display = 'none';
     scoreboard.style.display = 'none';
-    leaderboardContainer.style.display = 'block';
+    leaderboard.style.display = 'block';
   }
 
   startButton.addEventListener('click', () => {
@@ -278,11 +292,18 @@
     spawnViruses();
   });
 
-  // Show start screen on page load, and also render leaderboard in console for debugging
-  window.onload = function() {
-    showStartScreen();
-    renderLeaderboard();
-  };
+  playAgainButton.addEventListener('click', () => {
+    gameOverScreen.style.display = 'none';
+    score = 0;
+    scoreboard.textContent = `Score: ${score}`;
+    gameActive = true;
+    showGame();
+    spawnViruses();
+  });
+
+  // Show start screen initially
+  showStartScreen();
+  renderLeaderboard();
 </script>
 
 </body>
