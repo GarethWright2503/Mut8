@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Catch the MUT8 Virus</title>
+<style>
+  body {
+    margin: 0;
+    background: url('Images/mut8-background.jpg') no-repeat center center fixed;
+    background-size: contain;
+    background-color: black;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+    color: #fff;
+    text-align: center;
+    user-select: none;
+  }
+
+  #startScreen {
+    margin-top: 100px;
+  }
+
+  #gameContainer {
+    position: relative;
+    width: 100vw;
+    height: 80vh;
+    overflow: hidden;
+    margin: 0 auto;
+    touch-action: manipulation;
+    display: none; /* hidden initially */
+  }
+
+  .virus {
+    position: absolute;
+    width: 10vw;
+    height: 10vw;
+    max-width: 90px;
+    max-height: 90px;
+    background-image: url('Images/Zombie.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    user-select: none;
+  }
+
+  #scoreboard {
+    font-size: 1.5em;
+    margin: 10px 0 20px 0;
+    display: none; /* hidden initially */
+  }
+
+  #usernameInput, #startButton {
+    font-size: 1.2em;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    margin: 5px;
+    max-width: 300px;
+    width: 300px;
+  }
+
+  #leaderboard {
+    max-width: 400px;
+    margin: 20px auto;
+    background: rgba(0,0,0,0.6);
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1em;
+    overflow-y: auto;
+    max-height: 220px;
+    display: none; /* hidden initially */
+  }
+
+  #leaderboard h2 {
+    margin-top: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    #usernameInput, #startButton {
+      width: 90%;
+      font-size: 1.4em;
+    }
+
+    #leaderboard {
+      width: 90%;
+      font-size: 0.9em;
+      max-height: 180px;
+    }
+
+    #scoreboard {
+      font-size: 1.3em;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Catch the MUT8 Virus</h1>
+
+<div id="startScreen">
+  <input type="text" id="usernameInput" placeholder="Enter username" maxlength="15" />
+  <button id="startButton">Start Game</button>
+</div>
+
+<div id="scoreboard">Score: 0</div>
+<div id="gameContainer"></div>
+
+<div id="leaderboard">
+  <h2>Leaderboard</h2>
+  <ol id="leaderboardList"></ol>
+</div>
+
+<script>
+  const gameContainer = document.getElementById('gameContainer');
+  const scoreboard = document.getElementById('scoreboard');
+  const startButton = document.getElementById('startButton');
+  const usernameInput = document.getElementById('usernameInput');
+  const leaderboardList = document.getElementById('leaderboardList');
+  const startScreen = document.getElementById('startScreen');
+  const leaderboard = document.getElementById('leaderboard');
+
+  let score = 0;
+  let viruses = [];
+  let spawnInterval;
+  let gameActive = false;
+
+  function randomX() {
+    return Math.random() * (gameContainer.clientWidth - 90);
+  }
+
+  function createVirus() {
+    if (!gameActive) return;
+    const virus = document.createElement('div');
+    virus.classList.add('virus');
+    virus.style.left = randomX() + 'px';
+    virus.style.bottom = '-90px';
+    gameContainer.appendChild(virus);
+
+    const speed = Math.max(3000 - score * 20, 800);
+
+    virus.animate(
+      [{ transform: 'translateY(0)' }, { transform: `translateY(-${gameContainer.clientHeight + 100}px)` }],
+      { duration: speed, easing: 'linear' }
+    ).onfinish = () => {
+      if (virus.parentElement) {
+        endGame();
+      }
+    };
+
+    function catchVirus() {
+      if (!gameActive) return;
+      score++;
+      scoreboard.textContent = `Score: ${score}`;
+      virus.remove();
+      viruses = viruses.filter(v => v !== virus);
+    }
+
+    virus.addEventListener('click', catchVirus);
+    virus.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      catchVirus();
+    }, { passive: false });
+
+    viruses.push(virus);
+  }
+
+  function spawnViruses() {
+    spawnInterval = setInterval(() => {
+      if (!gameActive) return;
+      createVirus();
+    }, Math.max(1500 - score * 10, 400));
+  }
+
+  function endGame() {
+    gameActive = false;
+    clearInterval(spawnInterval);
+    viruses.forEach(v => v.remove());
+    viruses = [];
+    alert(`Game Over! Your score: ${score}`);
+    saveScore();
+    showStartScreen();
+  }
+
+  function saveScore() {
+    const username = usernameInput.value.trim() || 'Anonymous';
+    if (score > 0) {
+      const leaderboardData = JSON.parse(localStorage.getItem('mut8Leaderboard') || '[]');
+      leaderboardData.push({ username, score });
+      leaderboardData.sort((a, b) => b.score - a.score);
+      if (leaderboardData.length > 10) leaderboardData.length = 10;
+      localStorage.setItem('mut8Leaderboard', JSON.stringify(leaderboardData));
+      renderLeaderboard();
+    }
+  }
+
+  function renderLeaderboard() {
+    const leaderboardData = JSON.parse(localStorage.getItem('mut8Leaderboard') || '[]');
+    leaderboardList.innerHTML = '';
+    leaderboardData.forEach(entry => {
+      const li = document.createElement('li');
+      li.textContent = `${entry.username}: ${entry.score}`;
+      leaderboardList.appendChild(li);
+    });
+  }
+
+  function showStartScreen() {
+    startScreen.style.display = 'block';
+    gameContainer.style.display = 'none';
+    scoreboard.style.display = 'none';
+    leaderboard.style.display = 'none';
+  }
+
+  function showGame() {
+    startScreen.style.display = 'none';
+    gameContainer.style.display = 'block';
+    scoreboard.style.display = 'block';
+    leaderboard.style.display = 'block';
+  }
+
+  startButton.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
+    if (username === '') {
+      alert('Please enter a username before starting!');
+      return;
+    }
+    score = 0;
+    scoreboard.textContent = `Score: ${score}`;
+    gameActive = true;
+    showGame();
+    spawnViruses();
+  });
+
+  // Show start screen initially
+  showStartScreen();
+  renderLeaderboard();
+</script>
+
+</body>
+</html>
