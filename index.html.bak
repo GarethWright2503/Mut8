@@ -219,20 +219,24 @@
     .catch(err => console.error("Error saving score:", err));
   }
 
-  function renderLeaderboardTop20() {
-    fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc?sort_by=score&sort_order=desc&limit=20")
-      .then(res => res.json())
-      .then(data => {
-        leaderboardListTop20.innerHTML = '';
+  function renderLeaderboard() {
+  fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc?sort_by=score&sort_order=desc&limit=10")
+    .then(res => res.json())
+    .then(data => {
+      leaderboardList.innerHTML = ''; // Clear the current leaderboard
+      if (data.length === 0) {
+        leaderboardList.innerHTML = '<li>No scores available.</li>';
+      } else {
         data.forEach(entry => {
           const li = document.createElement('li');
           li.textContent = `${entry.username}: ${entry.score}`;
-          leaderboardListTop20.appendChild(li);
+          leaderboardList.appendChild(li);
         });
-      })
-      .catch(err => {
-        console.error("Error loading leaderboard:", err);
-      });
+      }
+    })
+    .catch(err => {
+      console.error("Error loading leaderboard:", err);
+    });
   }
 
   function restartGame() {
