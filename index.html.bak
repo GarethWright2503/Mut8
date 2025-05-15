@@ -1,128 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Catch the MUT8 Virus</title>
-<style>
-  body {
-    margin: 0;
-    background: url('Images/mut8-background.jpg') no-repeat center center fixed;
-    background-size: contain;
-    background-color: black;
-    overflow: hidden;
-    font-family: 'Arial', sans-serif;
-    color: #fff;
-    text-align: center;
-    user-select: none;
-  }
-
-  h1 {
-    margin-top: 30px;
-    font-size: 2em;
-  }
-
-  #subheading {
-    font-size: 1.2em;
-    color: #ffaaaa;
-    margin-bottom: 30px;
-  }
-
-  #startScreen {
-    margin-top: 40px;
-  }
-
-  #gameContainer {
-    position: relative;
-    width: 100vw;
-    height: 80vh;
-    overflow: hidden;
-    margin: 0 auto;
-    touch-action: manipulation;
-    display: none;
-  }
-
-  .virus {
-    position: absolute;
-    width: 10vw;
-    height: 10vw;
-    max-width: 90px;
-    max-height: 90px;
-    background-image: url('Images/Zombie.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    cursor: pointer;
-    animation-timing-function: linear;
-    animation-fill-mode: forwards;
-    user-select: none;
-  }
-
-  #scoreboard {
-    font-size: 1.5em;
-    margin: 10px 0 20px 0;
-    display: none;
-  }
-
-  #walletInput, #startButton {
-    font-size: 1.2em;
-    padding: 8px 12px;
-    border-radius: 5px;
-    border: none;
-    margin: 5px;
-    max-width: 300px;
-    width: 300px;
-  }
-
-  #leaderboard {
-    max-width: 400px;
-    margin: 20px auto;
-    background: rgba(0,0,0,0.6);
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 1em;
-    overflow-y: auto;
-    max-height: 220px;
-    display: none;
-  }
-
-  #leaderboard h2 {
-    margin-top: 0;
-  }
-
-  @media (max-width: 768px) {
-    #startButton {
-      font-size: 2.8em !important;
-      padding: 24px 0 !important;
-      max-width: 100% !important;
-      width: 90vw !important;
-      border-radius: 12px !important;
-      margin: 20px auto !important;
-      display: block !important;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Catch the MUT8 Virus</title>
+  <style>
+    body {
+      margin: 0;
+      background: url('Images/mut8-background.jpg') no-repeat center center fixed;
+      background-size: contain;
+      background-color: black;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      color: #fff;
+      text-align: center;
+      user-select: none;
     }
-    #walletInput {
-      font-size: 1.8em !important;
-      max-width: 90vw !important;
-      width: 90vw !important;
-      padding: 12px !important;
-      margin: 10px auto !important;
-      display: block !important;
+
+    h1 {
+      margin-top: 20px;
+      font-size: 2.2em;
     }
-  }
-</style>
+
+    #subtitle {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    #startScreen {
+      margin-top: 40px;
+    }
+
+    #gameContainer {
+      position: relative;
+      width: 100vw;
+      height: 70vh;
+      overflow: hidden;
+      margin: 0 auto;
+      display: none;
+    }
+
+    .virus {
+      position: absolute;
+      width: 20vw;
+      height: 20vw;
+      max-width: 100px;
+      max-height: 100px;
+      background-image: url('Images/Zombie.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      cursor: pointer;
+    }
+
+    #scoreboard {
+      font-size: 1.6em;
+      margin: 10px 0;
+      display: none;
+    }
+
+    #walletInput, #startButton, #playAgainButton {
+      font-size: 1.2em;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: none;
+      margin: 5px;
+      width: 300px;
+      max-width: 90%;
+    }
+
+    #gameOverMessage {
+      font-size: 1.5em;
+      margin-top: 20px;
+      display: none;
+    }
+
+    #playAgainContainer {
+      margin-top: 10px;
+      display: none;
+    }
+
+    #leaderboard {
+      max-width: 400px;
+      margin: 20px auto;
+      background: rgba(0,0,0,0.6);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 1em;
+      overflow-y: auto;
+      max-height: 220px;
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.6em;
+      }
+
+      #subtitle {
+        font-size: 1em;
+      }
+
+      .virus {
+        width: 20vw;
+        height: 20vw;
+      }
+
+      #walletInput, #startButton, #playAgainButton {
+        font-size: 1.2em;
+        width: 95%;
+      }
+
+      #scoreboard {
+        font-size: 1.3em;
+      }
+
+      #leaderboard {
+        font-size: 0.9em;
+        width: 90%;
+      }
+    }
+  </style>
 </head>
 <body>
 
 <h1>Catch the MUT8 Virus</h1>
-<p id="subheading">Play to receive free airdrop of 100 tokens. There is no cure.</p>
+<div id="subtitle">Play to receive free airdrop of 100 tokens. There is no cure.</div>
 
 <div id="startScreen">
-  <input type="text" id="walletInput" placeholder="Enter wallet address" maxlength="50" />
+  <input type="text" id="walletInput" placeholder="Enter wallet address" maxlength="44" />
   <button id="startButton">Start Game</button>
 </div>
 
 <div id="scoreboard">Score: 0</div>
 <div id="gameContainer"></div>
+
+<div id="gameOverMessage"></div>
+
+<div id="playAgainContainer">
+  <button id="playAgainButton">Play Again</button>
+</div>
 
 <div id="leaderboard">
   <h2>Leaderboard</h2>
@@ -137,6 +155,9 @@
   const leaderboardList = document.getElementById('leaderboardList');
   const startScreen = document.getElementById('startScreen');
   const leaderboard = document.getElementById('leaderboard');
+  const gameOverMessage = document.getElementById('gameOverMessage');
+  const playAgainButton = document.getElementById('playAgainButton');
+  const playAgainContainer = document.getElementById('playAgainContainer');
 
   let score = 0;
   let viruses = [];
@@ -144,7 +165,7 @@
   let gameActive = false;
 
   function randomX() {
-    return Math.random() * (gameContainer.clientWidth - 90);
+    return Math.random() * (gameContainer.clientWidth - 100);
   }
 
   function createVirus() {
@@ -152,10 +173,10 @@
     const virus = document.createElement('div');
     virus.classList.add('virus');
     virus.style.left = randomX() + 'px';
-    virus.style.bottom = '-90px';
+    virus.style.bottom = '-100px';
     gameContainer.appendChild(virus);
 
-    const speed = Math.max(3000 - score * 20, 800);
+    const speed = Math.max(3000 - score * 30, 800);
 
     virus.animate(
       [{ transform: 'translateY(0)' }, { transform: `translateY(-${gameContainer.clientHeight + 100}px)` }],
@@ -187,7 +208,7 @@
     spawnInterval = setInterval(() => {
       if (!gameActive) return;
       createVirus();
-    }, Math.max(1500 - score * 10, 400));
+    }, Math.max(1200 - score * 10, 400));
   }
 
   function endGame() {
@@ -195,45 +216,35 @@
     clearInterval(spawnInterval);
     viruses.forEach(v => v.remove());
     viruses = [];
-    scoreboard.textContent = `Game Over! Your score: ${score}`;
+    gameOverMessage.textContent = `Game Over! Your score: ${score}`;
+    gameOverMessage.style.display = 'block';
+    playAgainContainer.style.display = 'block';
     saveScore();
-    showLeaderboard();
   }
 
   function saveScore() {
     const wallet = walletInput.value.trim();
     const timestamp = new Date().toISOString();
 
-    // First, check if wallet already exists
+    if (!wallet || wallet.length < 32 || wallet.length > 50) return;
+
     fetch(`https://sheetdb.io/api/v1/objf6s9bvsqbc/search?wallet=${wallet}`)
       .then(res => res.json())
       .then(data => {
-        if (data.length > 0) {
-          const existing = data[0];
-          const existingScore = parseInt(existing.score);
-          if (score > existingScore) {
-            // update score
-            fetch(`https://sheetdb.io/api/v1/objf6s9bvsqbc/wallet/${wallet}`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                data: { score, timestamp }
-              })
-            });
-          }
-        } else {
-          // create new entry
-          fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              data: [{ wallet, score, timestamp }]
-            })
-          });
-        }
-        renderLeaderboard();
-      })
-      .catch(err => console.error("Error checking wallet:", err));
+        if (data.length > 0 && parseInt(data[0].score) >= score) return;
+        const method = data.length > 0 ? 'PUT' : 'POST';
+        const url = data.length > 0
+          ? `https://sheetdb.io/api/v1/objf6s9bvsqbc/wallet/${wallet}`
+          : `https://sheetdb.io/api/v1/objf6s9bvsqbc`;
+
+        fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            data: [{ wallet, score, timestamp }]
+          })
+        });
+      });
   }
 
   function renderLeaderboard() {
@@ -246,19 +257,8 @@
           li.textContent = `${entry.wallet}: ${entry.score}`;
           leaderboardList.appendChild(li);
         });
-      })
-      .catch(err => {
-        console.error("Error loading leaderboard:", err);
+        leaderboard.style.display = 'block';
       });
-  }
-
-  function showStartScreen() {
-    startScreen.style.display = 'block';
-    gameContainer.style.display = 'none';
-    scoreboard.style.display = 'none';
-    leaderboard.style.display = 'none';
-    scoreboard.textContent = 'Score: 0';
-    walletInput.value = '';
   }
 
   function showGame() {
@@ -266,29 +266,34 @@
     gameContainer.style.display = 'block';
     scoreboard.style.display = 'block';
     leaderboard.style.display = 'none';
-    scoreboard.textContent = `Score: ${score}`;
-  }
-
-  function showLeaderboard() {
-    startScreen.style.display = 'none';
-    gameContainer.style.display = 'none';
-    scoreboard.style.display = 'block';
-    leaderboard.style.display = 'block';
+    gameOverMessage.style.display = 'none';
+    playAgainContainer.style.display = 'none';
   }
 
   startButton.addEventListener('click', () => {
     const wallet = walletInput.value.trim();
-    if (wallet === '') {
-      alert('Please enter your wallet address!');
+    if (!wallet || wallet.length < 32 || wallet.length > 50) {
+      alert('Enter a valid wallet address!');
       return;
     }
     score = 0;
+    scoreboard.textContent = `Score: ${score}`;
     gameActive = true;
     showGame();
     spawnViruses();
   });
 
-  showStartScreen();
+  playAgainButton.addEventListener('click', () => {
+    score = 0;
+    scoreboard.textContent = `Score: ${score}`;
+    gameActive = true;
+    gameOverMessage.style.display = 'none';
+    playAgainContainer.style.display = 'none';
+    leaderboard.style.display = 'none';
+    showGame();
+    spawnViruses();
+  });
+
   renderLeaderboard();
 </script>
 
