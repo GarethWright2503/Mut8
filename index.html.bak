@@ -1,110 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Catch the MUT8 Virus</title>
-  <style>
-    body {
-      margin: 0;
-      background: url('Images/mut8-background.jpg') no-repeat center center fixed;
-      background-size: contain;
-      background-color: black;
-      overflow: hidden;
-      font-family: 'Arial', sans-serif;
-      color: #fff;
-      text-align: center;
-      user-select: none;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Catch the MUT8 Virus</title>
+<style>
+  body {
+    margin: 0;
+    background: url('Images/mut8-background.jpg') no-repeat center center fixed;
+    background-size: contain;
+    background-color: black;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+    color: #fff;
+    text-align: center;
+    user-select: none;
+  }
+
+  #startScreen {
+    margin-top: 100px;
+  }
+
+  #gameContainer {
+    position: relative;
+    width: 100vw;
+    height: 80vh;
+    overflow: hidden;
+    margin: 0 auto;
+    touch-action: manipulation;
+    display: none;
+  }
+
+  .virus {
+    position: absolute;
+    width: 10vw;
+    height: 10vw;
+    max-width: 90px;
+    max-height: 90px;
+    background-image: url('Images/Zombie.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    user-select: none;
+  }
+
+  #scoreboard {
+    font-size: 1.5em;
+    margin: 10px 0 20px 0;
+    display: none;
+  }
+
+  #usernameInput, #startButton {
+    font-size: 1.2em;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    margin: 5px;
+    max-width: 300px;
+    width: 300px;
+  }
+
+  #leaderboard-container {
+    max-width: 400px;
+    margin: 20px auto;
+    background: rgba(0,0,0,0.6);
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1em;
+    overflow-y: auto;
+    max-height: 300px;
+    display: none;
+  }
+
+  #leaderboard-container h2 {
+    margin-top: 0;
+  }
+
+  #leaderboard-list {
+    list-style-type: decimal;
+    padding-left: 20px;
+    text-align: left;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    #usernameInput, #startButton {
+      width: 90%;
+      font-size: 1.4em;
     }
 
-    #startScreen {
-      margin-top: 100px;
-    }
-
-    #gameContainer {
-      position: relative;
-      width: 100vw;
-      height: 80vh;
-      overflow: hidden;
-      margin: 0 auto;
-      touch-action: manipulation;
-      display: none;
-    }
-
-    .virus {
-      position: absolute;
-      width: 10vw;
-      height: 10vw;
-      max-width: 90px;
-      max-height: 90px;
-      background-image: url('Images/Zombie.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      cursor: pointer;
-      animation-timing-function: linear;
-      animation-fill-mode: forwards;
-      user-select: none;
+    #leaderboard-container {
+      width: 90%;
+      font-size: 0.9em;
+      max-height: 220px;
     }
 
     #scoreboard {
-      font-size: 1.5em;
-      margin: 10px 0 20px 0;
-      display: none;
+      font-size: 1.3em;
     }
-
-    #usernameInput, #startButton {
-      font-size: 1.2em;
-      padding: 8px 12px;
-      border-radius: 5px;
-      border: none;
-      margin: 5px;
-      max-width: 300px;
-      width: 300px;
-    }
-
-    #gameOverPopup {
-      display: none;
-      background: rgba(0,0,0,0.9);
-      position: absolute;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 20px;
-      border-radius: 10px;
-      z-index: 100;
-      width: 90%;
-      max-width: 400px;
-    }
-
-    #leaderboardListTop20 {
-      text-align: left;
-      padding-left: 20px;
-      max-height: 250px;
-      overflow-y: auto;
-    }
-
-    #gameOverPopup button {
-      padding: 10px 15px;
-      margin-top: 10px;
-      font-size: 1em;
-      border: none;
-      border-radius: 5px;
-      background: #28a745;
-      color: white;
-      cursor: pointer;
-    }
-
-    @media (max-width: 480px) {
-      #usernameInput, #startButton {
-        width: 90%;
-        font-size: 1.4em;
-      }
-      #scoreboard {
-        font-size: 1.3em;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
 
@@ -118,13 +116,9 @@
 <div id="scoreboard">Score: 0</div>
 <div id="gameContainer"></div>
 
-<!-- Game Over Popup -->
-<div id="gameOverPopup">
-  <h2>Game Over!</h2>
-  <p id="finalScoreText"></p>
-  <h3>Top 20 Leaderboard</h3>
-  <ol id="leaderboardListTop20"></ol>
-  <button onclick="restartGame()">Play Again</button>
+<div id="leaderboard-container">
+  <h2>Top 20 Players</h2>
+  <ul id="leaderboard-list"></ul>
 </div>
 
 <script>
@@ -132,10 +126,9 @@
   const scoreboard = document.getElementById('scoreboard');
   const startButton = document.getElementById('startButton');
   const usernameInput = document.getElementById('usernameInput');
+  const leaderboardContainer = document.getElementById('leaderboard-container');
+  const leaderboardList = document.getElementById('leaderboard-list');
   const startScreen = document.getElementById('startScreen');
-  const gameOverPopup = document.getElementById('gameOverPopup');
-  const finalScoreText = document.getElementById('finalScoreText');
-  const leaderboardListTop20 = document.getElementById('leaderboardListTop20');
 
   let score = 0;
   let viruses = [];
@@ -148,14 +141,14 @@
 
   function createVirus() {
     if (!gameActive) return;
-
     const virus = document.createElement('div');
     virus.classList.add('virus');
     virus.style.left = randomX() + 'px';
     virus.style.bottom = '-90px';
     gameContainer.appendChild(virus);
 
-    const speed = Math.max(3000 - score * 50, 400); // Increase difficulty
+    // Speed increases as score increases (minimum duration 800ms)
+    const speed = Math.max(3000 - score * 20, 800);
 
     virus.animate(
       [{ transform: 'translateY(0)' }, { transform: `translateY(-${gameContainer.clientHeight + 100}px)` }],
@@ -195,65 +188,81 @@
     clearInterval(spawnInterval);
     viruses.forEach(v => v.remove());
     viruses = [];
-
-    finalScoreText.textContent = `Your score: ${score}`;
-    gameOverPopup.style.display = 'block';
-
+    alert(`Game Over! Your score: ${score}`);
     saveScore();
-    renderLeaderboardTop20();
+    showLeaderboard();
   }
 
   function saveScore() {
     const username = usernameInput.value.trim() || 'Anonymous';
     const timestamp = new Date().toISOString();
 
+    const scoreData = {
+      data: [{
+        username,
+        score,
+        timestamp
+      }]
+    };
+
     fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        data: [{ username, score, timestamp }]
-      })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(scoreData)
     })
     .then(res => res.json())
-    .then(() => console.log("Score saved"))
-    .catch(err => console.error("Error saving score:", err));
-  }
-
-  function renderLeaderboard() {
-  fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc?sort_by=score&sort_order=desc&limit=10")
-    .then(res => res.json())
-    .then(data => {
-      leaderboardList.innerHTML = ''; // Clear the current leaderboard
-      if (data.length === 0) {
-        leaderboardList.innerHTML = '<li>No scores available.</li>';
-      } else {
-        data.forEach(entry => {
-          const li = document.createElement('li');
-          li.textContent = `${entry.username}: ${entry.score}`;
-          leaderboardList.appendChild(li);
-        });
-      }
+    .then(response => {
+      console.log("Score saved:", response);
+      renderLeaderboard();  // Refresh leaderboard after save
     })
     .catch(err => {
-      console.error("Error loading leaderboard:", err);
+      console.error("Error saving score:", err);
     });
   }
 
-  function restartGame() {
-    gameOverPopup.style.display = 'none';
-    showStartScreen();
+  function renderLeaderboard() {
+    leaderboardList.innerHTML = "<li>Loading leaderboard...</li>";
+    fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc?sort_by=score&sort_order=desc&limit=20")
+      .then(res => res.json())
+      .then(data => {
+        leaderboardList.innerHTML = "";
+        if (!data || data.length === 0) {
+          leaderboardList.innerHTML = "<li>No scores yet.</li>";
+          return;
+        }
+        data.forEach(entry => {
+          const li = document.createElement("li");
+          li.textContent = `${entry.username}: ${entry.score}`;
+          leaderboardList.appendChild(li);
+        });
+      })
+      .catch(err => {
+        console.error("Error fetching leaderboard:", err);
+        leaderboardList.innerHTML = "<li>Error loading leaderboard.</li>";
+      });
   }
 
   function showStartScreen() {
     startScreen.style.display = 'block';
     gameContainer.style.display = 'none';
     scoreboard.style.display = 'none';
+    leaderboardContainer.style.display = 'none';
   }
 
   function showGame() {
     startScreen.style.display = 'none';
     gameContainer.style.display = 'block';
     scoreboard.style.display = 'block';
+    leaderboardContainer.style.display = 'none';
+  }
+
+  function showLeaderboard() {
+    startScreen.style.display = 'none';
+    gameContainer.style.display = 'none';
+    scoreboard.style.display = 'none';
+    leaderboardContainer.style.display = 'block';
   }
 
   startButton.addEventListener('click', () => {
@@ -269,7 +278,11 @@
     spawnViruses();
   });
 
-  showStartScreen();
+  // Show start screen on page load, and also render leaderboard in console for debugging
+  window.onload = function() {
+    showStartScreen();
+    renderLeaderboard();
+  };
 </script>
 
 </body>
