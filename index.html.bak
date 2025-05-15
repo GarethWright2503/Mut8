@@ -166,7 +166,8 @@
 
   // Validate wallet address (simple hex pattern, you can improve this)
   function isValidWallet(addr) {
-    return /^0x[a-fA-F0-9]{40}$/.test(addr);
+  const base58regex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+  return base58regex.test(addr);
   }
 
   function randomX() {
