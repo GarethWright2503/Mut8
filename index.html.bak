@@ -79,28 +79,13 @@
     margin-top: 0;
   }
 
-  /* Game Over Screen style */
   #gameOverScreen {
     display: none;
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.85);
-    color: white;
-    padding: 30px;
-    border-radius: 10px;
-    max-width: 350px;
-    text-align: center;
-    z-index: 9999;
-  }
-
-  #gameOverScreen button {
-    font-size: 1.2em;
-    padding: 8px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 15px;
+    margin-top: 20px;
+    background: rgba(255, 0, 0, 0.8);
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.5em;
   }
 
   /* Responsive */
@@ -119,6 +104,10 @@
     #scoreboard {
       font-size: 1.3em;
     }
+
+    #gameOverScreen {
+      font-size: 1.2em;
+    }
   }
 </style>
 </head>
@@ -134,15 +123,13 @@
 <div id="scoreboard">Score: 0</div>
 <div id="gameContainer"></div>
 
+<div id="gameOverScreen">
+  <div id="finalScore"></div>
+</div>
+
 <div id="leaderboard">
   <h2>Leaderboard</h2>
   <ol id="leaderboardList"></ol>
-</div>
-
-<div id="gameOverScreen">
-  <h2>Game Over!</h2>
-  <p id="finalScore">Your score: 0</p>
-  <button id="playAgainButton">Play Again</button>
 </div>
 
 <script>
@@ -155,7 +142,6 @@
   const leaderboard = document.getElementById('leaderboard');
   const gameOverScreen = document.getElementById('gameOverScreen');
   const finalScore = document.getElementById('finalScore');
-  const playAgainButton = document.getElementById('playAgainButton');
 
   let score = 0;
   let viruses = [];
@@ -174,7 +160,7 @@
     virus.style.bottom = '-90px';
     gameContainer.appendChild(virus);
 
-    // Speed increases as score grows
+    // Speed up the virus as score increases
     const speed = Math.max(3000 - score * 20, 800);
 
     virus.animate(
@@ -216,7 +202,8 @@
     viruses.forEach(v => v.remove());
     viruses = [];
 
-    finalScore.textContent = `Your score: ${score}`;
+    // Remove the alert popup - instead show in-game
+    finalScore.textContent = `Game Over! Your score: ${score}`;
     gameOverScreen.style.display = 'block';
 
     saveScore();
@@ -239,7 +226,7 @@
     .then(() => console.log("Score saved"))
     .catch(err => console.error("Error saving score:", err));
   }
-  
+
   function renderLeaderboard() {
     fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc?sort_by=score&sort_order=desc&limit=20")
       .then(res => res.json())
@@ -273,9 +260,6 @@
   }
 
   function showLeaderboard() {
-    startScreen.style.display = 'none';
-    gameContainer.style.display = 'none';
-    scoreboard.style.display = 'none';
     leaderboard.style.display = 'block';
   }
 
@@ -285,15 +269,6 @@
       alert('Please enter a username before starting!');
       return;
     }
-    score = 0;
-    scoreboard.textContent = `Score: ${score}`;
-    gameActive = true;
-    showGame();
-    spawnViruses();
-  });
-
-  playAgainButton.addEventListener('click', () => {
-    gameOverScreen.style.display = 'none';
     score = 0;
     scoreboard.textContent = `Score: ${score}`;
     gameActive = true;
