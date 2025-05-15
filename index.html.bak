@@ -187,24 +187,34 @@
   }
 
   function saveScore() {
-    const username = usernameInput.value.trim() || 'Anonymous';
-    if (score > 0) {
-      const leaderboardData = JSON.parse(localStorage.getItem('mut8Leaderboard') || '[]');
-      leaderboardData.push({ username, score });
-      leaderboardData.sort((a, b) => b.score - a.score);
-      if (leaderboardData.length > 10) leaderboardData.length = 10;
-      localStorage.setItem('mut8Leaderboard', JSON.stringify(leaderboardData));
-      renderLeaderboard();
-    }
-  }
+  const username = usernameInput.value.trim() || 'Anonymous';
+  const timestamp = new Date().toISOString();
 
+  fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      data: [{ username, score, timestamp }]
+    })
+  })
+  .then(res => res.json())
+  .then(() => console.log("Score saved"))
+  .catch(err => console.error("Error saving score:", err));
+    }
+  
   function renderLeaderboard() {
-    const leaderboardData = JSON.parse(localStorage.getItem('mut8Leaderboard') || '[]');
-    leaderboardList.innerHTML = '';
-    leaderboardData.forEach(entry => {
-      const li = document.createElement('li');
-      li.textContent = `${entry.username}: ${entry.score}`;
-      leaderboardList.appendChild(li);
+  fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc?sort_by=score&sort_order=desc&limit=10")
+    .then(res => res.json())
+    .then(data => {
+      leaderboardList.innerHTML = '';
+      data.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = `${entry.username}: ${entry.score}`;
+        leaderboardList.appendChild(li);
+      });
+    })
+    .catch(err => {
+      console.error("Error loading leaderboard:", err);
     });
   }
 
