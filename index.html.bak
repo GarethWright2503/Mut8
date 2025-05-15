@@ -17,8 +17,19 @@
     user-select: none;
   }
 
+  h1 {
+    margin-top: 30px;
+    font-size: 2em;
+  }
+
+  #subheading {
+    font-size: 1.2em;
+    color: #ffaaaa;
+    margin-bottom: 30px;
+  }
+
   #startScreen {
-    margin-top: 100px;
+    margin-top: 40px;
   }
 
   #gameContainer {
@@ -28,7 +39,7 @@
     overflow: hidden;
     margin: 0 auto;
     touch-action: manipulation;
-    display: none; /* hidden initially */
+    display: none;
   }
 
   .virus {
@@ -50,10 +61,10 @@
   #scoreboard {
     font-size: 1.5em;
     margin: 10px 0 20px 0;
-    display: none; /* hidden initially */
+    display: none;
   }
 
-  #usernameInput, #startButton {
+  #walletInput, #startButton {
     font-size: 1.2em;
     padding: 8px 12px;
     border-radius: 5px;
@@ -72,14 +83,13 @@
     font-size: 1em;
     overflow-y: auto;
     max-height: 220px;
-    display: none; /* hidden initially */
+    display: none;
   }
 
   #leaderboard h2 {
     margin-top: 0;
   }
 
-  /* Updated Responsive Styles for Mobile (incl Safari) */
   @media (max-width: 768px) {
     #startButton {
       font-size: 2.8em !important;
@@ -89,12 +99,8 @@
       border-radius: 12px !important;
       margin: 20px auto !important;
       display: block !important;
-      -webkit-appearance: none !important;
-      -webkit-touch-callout: none !important;
-      -webkit-user-select: none !important;
-      user-select: none !important;
     }
-    #usernameInput {
+    #walletInput {
       font-size: 1.8em !important;
       max-width: 90vw !important;
       width: 90vw !important;
@@ -108,9 +114,10 @@
 <body>
 
 <h1>Catch the MUT8 Virus</h1>
+<p id="subheading">Play to receive free airdrop of 100 tokens. There is no cure.</p>
 
 <div id="startScreen">
-  <input type="text" id="usernameInput" placeholder="Enter username" maxlength="15" />
+  <input type="text" id="walletInput" placeholder="Enter wallet address" maxlength="50" />
   <button id="startButton">Start Game</button>
 </div>
 
@@ -126,7 +133,7 @@
   const gameContainer = document.getElementById('gameContainer');
   const scoreboard = document.getElementById('scoreboard');
   const startButton = document.getElementById('startButton');
-  const usernameInput = document.getElementById('usernameInput');
+  const walletInput = document.getElementById('walletInput');
   const leaderboardList = document.getElementById('leaderboardList');
   const startScreen = document.getElementById('startScreen');
   const leaderboard = document.getElementById('leaderboard');
@@ -194,22 +201,39 @@
   }
 
   function saveScore() {
-    const username = usernameInput.value.trim() || 'Anonymous';
+    const wallet = walletInput.value.trim();
     const timestamp = new Date().toISOString();
 
-    fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        data: [{ username, score, timestamp }]
+    // First, check if wallet already exists
+    fetch(`https://sheetdb.io/api/v1/objf6s9bvsqbc/search?wallet=${wallet}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.length > 0) {
+          const existing = data[0];
+          const existingScore = parseInt(existing.score);
+          if (score > existingScore) {
+            // update score
+            fetch(`https://sheetdb.io/api/v1/objf6s9bvsqbc/wallet/${wallet}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                data: { score, timestamp }
+              })
+            });
+          }
+        } else {
+          // create new entry
+          fetch("https://sheetdb.io/api/v1/objf6s9bvsqbc", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              data: [{ wallet, score, timestamp }]
+            })
+          });
+        }
+        renderLeaderboard();
       })
-    })
-    .then(res => res.json())
-    .then(() => {
-      console.log("Score saved");
-      renderLeaderboard();
-    })
-    .catch(err => console.error("Error saving score:", err));
+      .catch(err => console.error("Error checking wallet:", err));
   }
 
   function renderLeaderboard() {
@@ -219,7 +243,7 @@
         leaderboardList.innerHTML = '';
         data.forEach(entry => {
           const li = document.createElement('li');
-          li.textContent = `${entry.username}: ${entry.score}`;
+          li.textContent = `${entry.wallet}: ${entry.score}`;
           leaderboardList.appendChild(li);
         });
       })
@@ -234,7 +258,7 @@
     scoreboard.style.display = 'none';
     leaderboard.style.display = 'none';
     scoreboard.textContent = 'Score: 0';
-    usernameInput.value = '';
+    walletInput.value = '';
   }
 
   function showGame() {
@@ -253,9 +277,9 @@
   }
 
   startButton.addEventListener('click', () => {
-    const username = usernameInput.value.trim();
-    if (username === '') {
-      alert('Please enter a username before starting!');
+    const wallet = walletInput.value.trim();
+    if (wallet === '') {
+      alert('Please enter your wallet address!');
       return;
     }
     score = 0;
